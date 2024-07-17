@@ -7,6 +7,7 @@ from typing import TypeVar
 import semgrep.semgrep_interfaces.semgrep_output_v1 as out
 from semgrep.semgrep_core import SemgrepCore
 from semgrep.verbose_logging import getLogger
+from security import safe_command
 
 logger = getLogger(__name__)
 
@@ -93,8 +94,7 @@ T = TypeVar("T")
 
 def _call(call: out.FunctionCall, cls: Type[T]) -> Optional[T]:
     semgrep_core_path = SemgrepCore.executable_path()
-    with subprocess.Popen(
-        [semgrep_core_path, "-rpc"],
+    with safe_command.run(subprocess.Popen, [semgrep_core_path, "-rpc"],
         stdin=subprocess.PIPE,
         stdout=subprocess.PIPE,
         text=True,
